@@ -1,4 +1,4 @@
-module github.com/the-control-group/go-jsonpath/v2
+module github.com/the-control-group/go-jsonpath
 
 go 1.18
 
