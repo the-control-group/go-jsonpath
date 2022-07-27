@@ -1,40 +1,43 @@
 package jsonpath
 
 /*
-We wrap "github.com/oliveagle/jsonpath" so that we can implement some json interface methods on top of the base type.
+We wrap "github.com/PaesslerAG/jsonpath" so that we can implement some json interface methods on top of the base type.
 */
 
-// stdlib
 import (
-	// "bytes"
-	// "io"
+	"context"
+	"encoding/json"
 	"strings"
-	// "encoding/json"
-)
 
-// external
-import (
-	"github.com/oliveagle/jsonpath"
+	"github.com/PaesslerAG/gval"
+	"github.com/PaesslerAG/jsonpath"
 )
 
 func GetPathValue(data interface{}, jsonPath JsonPath) (interface{}, error) {
-	return jsonPath.Path.Lookup(data)
+	return jsonPath.Path(context.Background(), data)
 }
 
+// MustParsePath passes the jsonpath expression or panics on error
 func MustParsePath(path string) JsonPath {
-	compiled := jsonpath.MustCompile(path)
+	compiled, err := jsonpath.New(path)
+	if err != nil {
+		panic(err)
+	}
 	return JsonPath{compiled, path}
 }
 
 type JsonPath struct {
-	Path *jsonpath.Compiled
-	str   string
+	Path gval.Evaluable
+	str  string
 }
 
 func (jp *JsonPath) UnmarshalJSON(path []byte) error {
 	// primary
-	jp.str = strings.Trim(string(path), `"`)
-	compiled, err := jsonpath.Compile(jp.str)
+	err := json.Unmarshal(path, &jp.str)
+	if err != nil {
+		return err
+	}
+	compiled, err := jsonpath.New(jp.str)
 	if err != nil {
 		return err
 	}
