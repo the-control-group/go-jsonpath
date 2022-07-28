@@ -7,7 +7,6 @@ We wrap "github.com/PaesslerAG/jsonpath" so that we can implement some json inte
 import (
 	"context"
 	"encoding/json"
-	"strings"
 
 	"github.com/PaesslerAG/gval"
 	"github.com/PaesslerAG/jsonpath"
@@ -46,8 +45,8 @@ func (jp *JsonPath) UnmarshalJSON(path []byte) error {
 	return nil
 }
 
-func (jp *JsonPath) MarshalJSON() ([]byte, error) {
-	return []byte(`"` + strings.TrimRight(jp.String(), `"`) + `"`), nil
+func (jp JsonPath) MarshalJSON() ([]byte, error) {
+	return json.Marshal(jp.String())
 }
 
 func (jp *JsonPath) String() string {

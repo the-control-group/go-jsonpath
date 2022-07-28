@@ -39,3 +39,16 @@ func TestJsonUnmarshal(t *testing.T) {
 		return
 	}
 }
+
+func TestJsonMarshal(t *testing.T) {
+	jp := MustParsePath(`$["key with spaces"]`)
+	b, err := json.Marshal(jp)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if string(b) != `"$[\"key with spaces\"]"` {
+		t.Error("value is incorrect")
+		return
+	}
+}
